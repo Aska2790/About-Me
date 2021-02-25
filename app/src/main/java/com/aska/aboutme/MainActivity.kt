@@ -3,34 +3,53 @@ package com.aska.aboutme
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.view.isVisible
+import com.aska.aboutme.databinding.ActivityMainDataBinding
 
 class MainActivity : AppCompatActivity() {
+
+    //region Properties
+
+    private lateinit var dataBinding: ActivityMainDataBinding
+    private val userNameModel = NameModel("Aleks Haecky")
+
+    //endregion
+
+    //region Lifecycle
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        findViewById<Button>(R.id.doneButton).setOnClickListener {
-            addNickName(it)
+        dataBinding = ActivityMainDataBinding.inflate(layoutInflater)
+        setContentView(dataBinding.root)
+
+        dataBinding.nameModel = userNameModel
+        dataBinding.doneButton.setOnClickListener {
+            addNickName()
         }
     }
 
-    private fun addNickName(view: View) {
-        val nicknameEditText = findViewById<EditText>(R.id.nicknameEditText)
-        val nicknameTextView = findViewById<TextView>(R.id.nicknameTextView)
+    //endregion
 
-        nicknameTextView.text = nicknameEditText.text.toString()
-        nicknameTextView.isVisible = true
-        nicknameEditText.isVisible = false
-        view.isVisible = false
+    //region Actions
 
-        // Hide the keyboard.
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+    private fun addNickName() {
+
+        dataBinding.apply {
+            val inputNickname = nicknameEditText.text.toString()
+
+            if (inputNickname.isNotEmpty()) {
+                nameModel = userNameModel.copy(nickname = inputNickname)
+                nicknameTextView.isVisible = true
+                nicknameEditText.isVisible = false
+                doneButton.isVisible = false
+            }
+
+            // Hide the keyboard.
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(root.windowToken, 0)
+        }
     }
+
+    //endregion
 }
